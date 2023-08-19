@@ -23,6 +23,8 @@ refs.loadMoreBtn.addEventListener(`click`, showSetPictures);
 async function showSetPictures(event) {
   event.preventDefault();
 
+  loadMoreHide();  
+    
   let currentSearchTerm = refs.input.value;
   checkNewDataImput(currentSearchTerm, previousTerm);
 
