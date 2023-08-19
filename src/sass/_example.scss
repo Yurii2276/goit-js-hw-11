@@ -26,3 +26,22 @@
   background-size: cover;
   background-position: center;
 }
+
+// My styles
+.search-form {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 15px;
+  background-color: #0074d9;
+}
+
+.submit {
+  border: 1px solid transparent;
+  
+}
+
+.input-field {
+    border: 1px solid transparent;
+  }
