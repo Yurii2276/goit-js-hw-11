@@ -1,6 +1,8 @@
 import { fetchPics } from './pixaby_api';
 import { createMarkup } from './markup';
 import Notiflix from 'notiflix';
+import SimpleLightbox from 'simplelightbox';
+import 'simplelightbox/dist/simple-lightbox.min.css';
 
 const refs = {
   form: document.getElementById(`search-form`),
@@ -9,8 +11,17 @@ const refs = {
   gallery: document.querySelector(`.gallery`),
 };
 
+const lightboxOptions = {
+  overlay: true,
+  spinner: true,
+  nav: true,
+  captions: true,
+  captionType: 'data',
+};
+const lightbox = new SimpleLightbox('.gallery a', lightboxOptions);
+
 let page = 0;
-const limitPic = 4;
+const limitPic = 8;
 let totalPage = 0;
 const previousTerm = { value: '' };
 
@@ -23,26 +34,40 @@ refs.loadMoreBtn.addEventListener(`click`, showSetPictures);
 async function showSetPictures(event) {
   event.preventDefault();
 
-  loadMoreHide();  
-    
+  loadMoreHide();
+
   let currentSearchTerm = refs.input.value;
   checkNewDataImput(currentSearchTerm, previousTerm);
 
   try {
     const data = await fetchPics(currentSearchTerm, (page += 1), limitPic);
 
-    console.log(data);
-    console.log(data.totalHits);
+    showTotalImagesFound(page, data.totalHits);
+
     totalPage = Math.ceil(data.totalHits / limitPic);
-    console.log(totalPage);
-    console.log(page);
 
     refs.gallery.insertAdjacentHTML(`beforeend`, createMarkup(data.hits));
 
+     const { height: cardHeight } =
+      refs.gallery.firstElementChild.getBoundingClientRect();
+    window.scrollBy({
+      top: cardHeight * 2,
+      behavior: 'smooth',
+    });
+      
+    refreshLightbox();
+
+    // const { height: cardHeight } =
+    //   refs.gallery.firstElementChild.getBoundingClientRect();
+    // window.scrollBy({
+    //   top: cardHeight * 2,
+    //   behavior: 'smooth',
+    // });
+
     checkTheEnd(page, totalPage);
   } catch (error) {
-      loadMoreHide();
-      console.error(error);
+    loadMoreHide();
+    console.error(error);
   }
 }
 
@@ -73,4 +98,14 @@ function checkNewDataImput(currentTerm, previousTerm) {
     totalPage = 0;
     return page, totalPage;
   }
+}
+
+function showTotalImagesFound(pagecurent, totalimage) {
+  if (pagecurent === 1) {
+    Notiflix.Notify.success(`Hooray! We found ${totalimage} images.`);
+  }
+}
+
+function refreshLightbox() {
+  lightbox.refresh();
 }
