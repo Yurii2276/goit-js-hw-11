@@ -21,7 +21,7 @@ const lightboxOptions = {
 const lightbox = new SimpleLightbox('.gallery a', lightboxOptions);
 
 let page = 0;
-const limitPic = 8;
+const limitPic = 40;
 let totalPage = 0;
 const previousTerm = { value: '' };
 
@@ -32,44 +32,49 @@ refs.form.addEventListener(`submit`, showSetPictures);
 refs.loadMoreBtn.addEventListener(`click`, showSetPictures);
 
 async function showSetPictures(event) {
-  event.preventDefault();
-
-  loadMoreHide();
-
-  let currentSearchTerm = refs.input.value;
-  checkNewDataImput(currentSearchTerm, previousTerm);
-
-  try {
-    const data = await fetchPics(currentSearchTerm, (page += 1), limitPic);
-
-    showTotalImagesFound(page, data.totalHits);
-
-    totalPage = Math.ceil(data.totalHits / limitPic);
-
-    refs.gallery.insertAdjacentHTML(`beforeend`, createMarkup(data.hits));
-
-     const { height: cardHeight } =
-      refs.gallery.firstElementChild.getBoundingClientRect();
-    window.scrollBy({
-      top: cardHeight * 2,
-      behavior: 'smooth',
-    });
-      
-    refreshLightbox();
-
-    // const { height: cardHeight } =
-    //   refs.gallery.firstElementChild.getBoundingClientRect();
-    // window.scrollBy({
-    //   top: cardHeight * 2,
-    //   behavior: 'smooth',
-    // });
-
-    checkTheEnd(page, totalPage);
-  } catch (error) {
+    event.preventDefault();
+    
     loadMoreHide();
-    console.error(error);
+
+    let currentSearchTerm = refs.input.value;
+
+    if (currentSearchTerm !== ``) {
+        
+            checkNewDataImput(currentSearchTerm, previousTerm);
+
+                try {
+                    const data = await fetchPics(currentSearchTerm, (page += 1), limitPic);
+
+                    showTotalImagesFound(page, data.totalHits);
+
+                    totalPage = Math.ceil(data.totalHits / limitPic);
+
+                    refs.gallery.insertAdjacentHTML(`beforeend`, createMarkup(data.hits));
+      
+                    refreshLightbox();
+
+                    const { height: cardHeight } =
+                            refs.gallery.firstElementChild.getBoundingClientRect();
+                    window.scrollBy({
+                        top: cardHeight * 2,
+                        behavior: 'smooth',
+                        });
+
+                    checkTheEnd(page, totalPage);
+                    
+  }             catch (error) {
+                loadMoreHide();
+                 console.error(error);
   }
 }
+
+    else {
+        Notiflix.Notify.failure(`Enter a topic to search in the input field! 
+        As long as the field is empty, the search will not be activated!`);
+        return;
+    };
+    
+};
 
 function loadMoreShow() {
   refs.loadMoreBtn.style.display = 'block';
@@ -109,3 +114,4 @@ function showTotalImagesFound(pagecurent, totalimage) {
 function refreshLightbox() {
   lightbox.refresh();
 }
+
